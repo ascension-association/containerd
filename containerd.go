@@ -85,7 +85,32 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
-	if err := syscall.Exec("/usr/local/bin/containerd", os.Args, os.Environ()); err != nil {
+	if err := syscall.Exec("/usr/local/bin/containerd", os.Args, expandPath(os.Environ())); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// expandPath returns env, but with PATH= modified or added
+// such that both /user and /usr/local/bin are included, which containerd needs for runc.
+func expandPath(env []string) []string {
+	extra := "/user:/usr/local/bin"
+	found := false
+	for idx, val := range env {
+		parts := strings.Split(val, "=")
+		if len(parts) < 2 {
+			continue // malformed entry
+		}
+		key := parts[0]
+		if key != "PATH" {
+			continue
+		}
+		val := strings.Join(parts[1:], "=")
+		env[idx] = fmt.Sprintf("%s=%s:%s", key, extra, val)
+		found = true
+	}
+	if !found {
+		const busyboxDefaultPATH = "/usr/local/sbin:/sbin:/usr/sbin:/usr/local/bin:/bin:/usr/bin"
+		env = append(env, fmt.Sprintf("PATH=%s:%s", extra, busyboxDefaultPATH))
+	}
+	return env
 }
