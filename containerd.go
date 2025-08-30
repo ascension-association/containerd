@@ -1,4 +1,4 @@
-// Binary podman is a gokrazy wrapper program that runs the bundled containerd
+// Binary containerd is a gokrazy wrapper program that runs the bundled containerd
 // executable in /usr/local/bin/containerd after doing any necessary runtime system
 // setup.
 package main
@@ -74,24 +74,13 @@ func makeWritable(dir string) error {
 }
 
 func main() {
-	// Workaround for podman ≤ v4.2.1, which failed on read-only /etc:
-	// https://github.com/containers/common/commit/50c2c97c3b828f908f1a22f6967c1136163dcefd
-	//
-	// The fix was imported into podman as part of commit
-	// https://github.com/containers/podman/commit/0f739355635d5bc4d538cf88009d7af533e7c289
-	//
-	// TODO: drop this entire binary with podman > v4.2.1
-	//if err := makeWritable("/etc/cni/net.d/"); err != nil {
-	//	log.Fatal(err)
-	//}
-
-	if err := syscall.Exec("/usr/local/bin/containerd", os.Args, expandPath(os.Environ())); err != nil {
+	if err := syscall.Exec("/usr/local/bin/containerd", os.Args, expandPath(append(os.Environ(), "XDG_RUNTIME_DIR=/tmp"))); err != nil {
 		log.Fatal(err)
 	}
 }
 
 // expandPath returns env, but with PATH= modified or added
-// such that both /user and /usr/local/bin are included, which containerd needs for runc.
+// such that both /user and /usr/local/bin are included, which containerd needs.
 func expandPath(env []string) []string {
 	extra := "/user:/usr/local/bin"
 	found := false
