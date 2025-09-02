@@ -14,13 +14,6 @@ gok update
 The sections below assume you are logged into to your gokrazy device using
 [breakglass](https://github.com/gokrazy/breakglass).
 
-
-#### Run a container
-
-```
-ctr image pull docker.io/library/alpine:latest && ctr run --net-host --rm -t docker.io/library/alpine:latest my-container-name
-```
-
 #### Optional: tmpfs
 
 By default, containers are stored on disk (`/var` is a symlink to `/perm/var` on
