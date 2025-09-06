@@ -34,3 +34,7 @@ mount -t tmpfs tmpfs /var
 #### Optional: nerdctl
 
 While the `ctr` tool is [bundled together with containerd](https://github.com/containerd/containerd/blob/main/docs/getting-started.md#interacting-with-containerd-via-cli), it should be noted the `ctr` tool is solely made for debugging containerd. The [nerdctl](https://github.com/containerd/nerdctl) tool provides a stable and human-friendly user experience.
+
+### Example
+
+For a full example of how you might use containerd with gokrazy, check out [Galos](https://github.com/ascension-association/galos)
